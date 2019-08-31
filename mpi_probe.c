@@ -1,4 +1,4 @@
-#include <mpi.h>
+#include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX 100
@@ -29,7 +29,7 @@ MPI_Status estado;
     /* Aloca um vetor para guardar os números transmitidos */
             vet_num = (int*) malloc(sizeof(int)*total_num);
     /* Agora recebe a mensagem com o vetor previamente alocado  */
-            MPI_Recv(vet_num, total_num, MPI_INT, origem, etiqueta,
+            MPI_Recv(vet_num, total_num, MPI_INT, origem, etiq,
              MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         printf("Processo %d recebeu dinamicamente %d números de %d.\n", destino, total_num, origem);
             free(vet_num);
