@@ -25,8 +25,7 @@ int main(int argc, char *argv[]) {
     else if (meu_ranque == 1) {
         MPI_Status info;
     // Recebe no máximo MAX_NUMEROS do processo 0 
-        MPI_Recv(numeros, MAX_NUMEROS, MPI_INT, 0, 0, MPI_COMM_WORLD,
-             &info);
+        MPI_Recv(numeros, MAX_NUMEROS, MPI_INT, 0, 0, MPI_COMM_WORLD, &info);
 
     // depois de receber a mensagem, verifica o status para 
     // determinar quantos números foram realmente recebidos
