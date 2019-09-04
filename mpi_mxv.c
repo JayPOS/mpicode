@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
    double* x;
    int m, local_m, n, local_n;
    int M =1000, N=1000;
-   //  M e N devem ser positivos e divisíveis pelo número de prcoessos
+   //  M e N devem ser positivos e divisíveis pelo número de processos
    double start, finish, loc_elapsed, elapsed;
 
    MPI_Init(&argc, &argv);
@@ -31,22 +31,24 @@ int main(int argc, char* argv[]) {
 
    if (meu_ranque == 0) 
 	{
-		printf("Por favor entre com M e N: ");
+		printf("Por favor entre com M e N: \n");
    		scanf("%d %d",&m,&n);   // strtol(argv[1], NULL, 10);
-   		printf("\n");
+   		printf("Lidos \n");
    		if (m % num_procs != 0  || n % num_procs != 0) 
 			{
-          			printf("Erro! \n M e N deve devem ser divisíveis pelo número de processor \n");
+          			printf("Erro! \n M e N deve devem ser divisíveis pelo número de processos \n");
           			exit(1);
         		}
    }
-
-   MPI_Bcast(m, 1, MPI_INT, 0, MPI_COMM_WORLD);
-   MPI_Bcast(n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+   printf("Broadcast \n");
+   MPI_Bcast(&m, 1, MPI_INT, 0, MPI_COMM_WORLD);
+   MPI_Barrier(MPI_COMM_WORLD);
+   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+   printf("Recebido \n");
 
    local_m = m/num_procs;
    local_n = n/num_procs;
-
+   
     if ( (local_A=(double *)malloc(local_m*local_n*sizeof(double))) == NULL )
       perror("Alocação de memória para a matriz A");
     if ( (local_x=(double *)malloc(local_n*sizeof(double))) == NULL )
@@ -54,6 +56,7 @@ int main(int argc, char* argv[]) {
    if ( (local_y=(double *)malloc(local_m*sizeof(double))) == NULL )
       perror("Alocação de memória para o vetor de saída y");
 
+   printf("Memória Alocada \n");
 
 /* 
 #pragma omp parallel for default(shared) schedule(static) num_threads(4)
@@ -100,9 +103,8 @@ void Mat_vect_mult(
       int       n          /* in  */,
       int       local_n    /* in  */) {
    int local_i, j;
-
-   MPI_Allgather(local_x, local_n, MPI_DOUBLE,
-         x, local_n, MPI_DOUBLE, MPI_COMM_WORLD);
+   printf("Allgather \n");
+   MPI_Allgather(local_x, local_n, MPI_DOUBLE, x, local_n, MPI_DOUBLE, MPI_COMM_WORLD);
 
    for (local_i = 0; local_i < local_m; local_i++) {
       local_y[local_i] = 0.0;
