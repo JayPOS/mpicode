@@ -15,8 +15,7 @@ int main(int argc, char *argv[]) {
     if (meu_ranque != 0)  {
         sprintf(mensagem, "Processo %d está vivo!", meu_ranque);
         destino = 0;
-        MPI_Send(mensagem,strlen(mensagem)+1,MPI_CHAR,destino,etiq,
-        MPI_COMM_WORLD);
+        MPI_Send(mensagem,strlen(mensagem)+1,MPI_CHAR, destino, etiq, MPI_COMM_WORLD);
    } else {
         for (origem=1; origem < num_procs; origem++) {
             MPI_Recv(mensagem, 200, MPI_CHAR, origem, etiq, MPI_COMM_WORLD, &info);
