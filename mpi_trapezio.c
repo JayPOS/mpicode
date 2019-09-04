@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
     if (meu_ranque == 0) integral = (f(a) + f(b))/2.0;
 
-    /* Cada processo calcula a integral aprox. sobre n/p                    trapézios*/ 
+    /* Cada processo calcula a integral aprox. sobre n/p trapézios*/ 
 
     for (x =  a + h*meu_ranque; x < b ; x += p*h) {
          integral += f(x);
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     /* Imprime o resultado */
     if (meu_ranque == 0){
         printf("Com n = %ld trapezoides, a estimativa \n", n);
-        printf("da integral de %lf até %lf = %lf \n", a, b, total);
+        printf("da integral de %lf ate %lf = %lf \n", a, b, total);
         }
 
     /* Termina o MPI */
