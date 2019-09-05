@@ -19,7 +19,7 @@ float soma_global, dif_quad_global, desvio_padrao;
    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
    /* Alimenta o gerador de números aleatórios com valores diferentes
        para cada processo  */
-   srand(MPI_Wtime()*meu_ranque);
+   srand(MPI_Wtime()*(meu_ranque+1));
    /* Cria um vetor de números aleatórios em todos os processos. 
     Cada número tem um valor entre 0 e 1  */
    nums_aleat  = (float *)malloc(sizeof(float) * NELEM);
