@@ -6,7 +6,7 @@ void mxv(int n, double* A, double* b, double* c);
 
 int main(int argc, char *argv[])
 {
-double *A,*b,*c;
+double *A,*Aloc, *b,*c;
 int i, j, m, n;
 int meu_ranque, num_procs, raiz=0;
 
@@ -15,46 +15,64 @@ int meu_ranque, num_procs, raiz=0;
    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
    
    if (meu_ranque == 0) {
-      printf("Por favor entre com n: ");
+      printf("Por favor entre com n: \n");
       scanf("%d",&n);
       printf("\n");
     }
-      if (meu_ranque == 0) {
+   
     m = num_procs;
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Bcast(&n, 1, MPI_INT, raiz, MPI_COMM_WORLD);
 
+   
     if (meu_ranque == 0) {
+        printf("Valor de m: %d e  n: %d \n", m,n);
        if ( (A=(double *)malloc(m*n*sizeof(double))) == NULL )
            perror("Erro de alocação de memória para a matriz A");
+        if ( (Aloc=(double *)malloc(m*n*sizeof(double))) == NULL )
+           perror("Erro de alocação de memória para a matriz local A");
        if ( (b=(double *)malloc(n*sizeof(double))) == NULL )
            perror("Erro de alocação de memória para o vetor b");
        if ( (c=(double *)malloc(m*sizeof(double))) == NULL )
            perror("Erro de alocação de memória para o vetor c");
      } else {
-        if ( (A=(double *)malloc(n*sizeof(double))) == NULL )
-           perror("Erro de alocação de memória para a matriz A");
+        if ( (Aloc=(double *)malloc(n*sizeof(double))) == NULL )
+           perror("Erro de alocação de memória para a matriz local A");
        if ( (b=(double *)malloc(n*sizeof(double))) == NULL )
            perror("Erro de alocação de memória para o vetor b");
        if ( (c=(double *)malloc(sizeof(double))) == NULL )
            perror("Erro de alocação de memória para o vetor c");
-     }
+     }    
 
-     printf("Atribuindo valor inicial à matriz A e ao vetor b\n");
      if (meu_ranque == 0) {
+         printf("Atribuindo valor inicial à matriz A e ao vetor b\n");
          for (j=0; j<n; j++)
               b[j] = 2.0;
          for (i=0; i<m; i++)
               for (j=0; j<n; j++)
-                  A[i*n + j] = i;
+                  A[i*n + j] = (double) i;
      }
-     MPI_Bcast(&b,n,MPI_DOUBLE,raiz, MPI_COMM_WORLD);
-     MPI_Scatter(&A,n, MPI_DOUBLE, &A, n, MPI_DOUBLE,raiz, MPI_COMM_WORLD);
 
-     printf("Mutiplicando a matriz A com o vetor b\n");
+     MPI_Bcast(&b[0],n,MPI_DOUBLE,raiz, MPI_COMM_WORLD);
+     MPI_Scatter(A, n, MPI_DOUBLE, Aloc, n, MPI_DOUBLE,raiz, MPI_COMM_WORLD);
      
-     (void) mxv(n, A, b, c);
-     
-     MPI_Gather(&c, 1, MPI_DOUBLE, &c, 1, MPI_DOUBLE, raiz, MPI_COMM_WORLD);
- //  printf
+//     for (i = 0; i < n; i++) 
+//         printf("%f ",Aloc[i]);
+//     printf("\n");
+
+     (void) mxv(n, Aloc, b, c);
+
+     MPI_Barrier(MPI_COMM_WORLD);  // ?
+
+     MPI_Gather(c, 1, MPI_DOUBLE, c, 1, MPI_DOUBLE, raiz, MPI_COMM_WORLD);
+
+     if (meu_ranque == 0){
+        printf("Imprimindo o resultado\n");
+	for (i = 0; i < m; i++) 
+             printf("%f ",c[i]);
+        printf("\n");
+     }
+     MPI_Finalize();
      free(A);
      free(b);
      free(c);
